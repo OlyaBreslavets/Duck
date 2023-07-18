@@ -20,18 +20,14 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         runner.$(http().client(duckService)
                 .send()
                 .get("/api/duck/action/fly")
-                .queryParam("id", id)
-                .message()
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .queryParam("id", id));
     }
 
     public void duckProperties(TestCaseRunner runner, String id) {
         runner.$(http().client(duckService)
                 .send()
                 .get("/api/duck/action/properties")
-                .queryParam("id", id)
-                .message()
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .queryParam("id", id));
     }
 
     public void duckQuack(TestCaseRunner runner, String id, String repetitionCount, String soundCount){
@@ -40,17 +36,13 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
                 .get("/api/duck/action/quack")
                 .queryParam("id", id)
                 .queryParam("repetitionCount", repetitionCount)
-                .queryParam("soundCount", soundCount)
-                .message()
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .queryParam("soundCount", soundCount));
     }
 
     public void duckSwim(TestCaseRunner runner, String id) {
         runner.$(http().client(duckService)
                 .send()
                 .get("/api/duck/action/swim")
-                .queryParam("id", id)
-                .message()
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .queryParam("id", id));
     }
 }
