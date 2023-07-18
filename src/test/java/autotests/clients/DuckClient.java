@@ -18,7 +18,7 @@ public class DuckClient extends TestNGCitrusSpringSupport {
 
     public void duckCreate(TestCaseRunner runner,
                            String color,
-                           double height,
+                           String height,
                            String material,
                            String sound,
                            String wingsState) {
@@ -40,9 +40,7 @@ public class DuckClient extends TestNGCitrusSpringSupport {
         runner.$(http().client(duckService)
                 .send()
                 .delete("/api/duck/delete")
-                .queryParam("id", id)
-                .message()
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .queryParam("id", id));
     }
 
     public void duckUpdate(TestCaseRunner runner,
@@ -60,16 +58,12 @@ public class DuckClient extends TestNGCitrusSpringSupport {
                 .queryParam("height", height)
                 .queryParam("material", material)
                 .queryParam("sound", sound)
-                .queryParam("wingsState", wingsState)
-                .message()
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .queryParam("wingsState", wingsState));
     }
 
     public void duckGetAllIds(TestCaseRunner runner) {
         runner.$(http().client(duckService)
                 .send()
-                .get("/api/duck/getAllIds")
-                .message()
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .get("/api/duck/getAllIds"));
     }
 }
