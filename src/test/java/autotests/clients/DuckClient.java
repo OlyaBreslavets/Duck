@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
+import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 @ContextConfiguration(classes = {EndpointConfig.class})
@@ -22,7 +23,7 @@ public class DuckClient extends TestNGCitrusSpringSupport {
     @Autowired
     protected HttpClient duckService;
 
-    public void duckCreate(TestCaseRunner runner,
+    public void duckCreateString(TestCaseRunner runner,
                            String color,
                            String height,
                            String material,
@@ -73,6 +74,15 @@ public class DuckClient extends TestNGCitrusSpringSupport {
                 .get("/api/duck/getAllIds"));
     }
 
+    public void duckCreateResources(TestCaseRunner runner, String expectedResource) {
+        runner.$(http().client(duckService)
+                .send()
+                .post("/api/duck/create")
+                .message()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new ClassPathResource(expectedResource)));
+    }
+
     @Description("Валидация полученного ответа (String)")
     public void validateResponseString(TestCaseRunner runner, String response) {
         runner.$(http().client(duckService)
@@ -80,6 +90,16 @@ public class DuckClient extends TestNGCitrusSpringSupport {
                 .response(HttpStatus.OK)
                 .message().type(MessageType.JSON)
                 .body(response));
+    }
+
+    @Description("Валидация полученного ответа DUCK (String)")
+    public void validateResponseStringForCreate(TestCaseRunner runner, String response) {
+        runner.$(http().client(duckService)
+                .receive()
+                .response(HttpStatus.OK)
+                .message().type(MessageType.JSON)
+                .body(response)
+                .extract(fromBody().expression("$.id", "duckId")));
     }
 
     @Description("Валидация полученного ответа (из папки resource)")

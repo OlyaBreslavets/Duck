@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
@@ -48,6 +49,42 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         runner.$(http().client(duckService)
                 .send()
                 .get("/api/duck/action/swim")
+                .queryParam("id", id));
+    }
+
+    public void duckCreateString(TestCaseRunner runner,
+                           String color,
+                           String height,
+                           String material,
+                           String sound,
+                           String wingsState) {
+        runner.$(http().client(duckService)
+                .send()
+                .post("/api/duck/create")
+                .message()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body("{\n" +
+                        "  \"color\": \"" + color + "\",\n" +
+                        "  \"height\": " + height + ",\n" +
+                        "  \"material\": \"" + material + "\",\n" +
+                        "  \"sound\": \"" + sound + "\",\n" +
+                        "  \"wingsState\": \"" + wingsState + "\"\n" +
+                        "}"));
+    }
+
+    public void duckCreatePayload(TestCaseRunner runner, Object expectedPayload) {
+        runner.$(http().client(duckService)
+                .send()
+                .post("/api/duck/create")
+                .message()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new ObjectMappingPayloadBuilder(expectedPayload, new ObjectMapper())));
+    }
+
+    public void duckDelete(TestCaseRunner runner, String id) {
+        runner.$(http().client(duckService)
+                .send()
+                .delete("/api/duck/delete")
                 .queryParam("id", id));
     }
 
