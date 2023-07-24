@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static org.springframework.http.HttpStatus.OK;
 
 public class DuckActionsTest extends DuckActionsClient {
 
@@ -72,7 +73,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Показать характеристики уточки, где положение крыльев - ACTIVE")
     @CitrusTest
     public void successfulPropertiesActive(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
             runner.$(http().client(duckService)
                     .receive()
@@ -80,7 +81,7 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckProperties(runner, "${duckId}");
-            validateResponseResource(runner, "duckCreateTest/duckCreateResponse.json");
+            validateResponseResource(runner, duckService, OK, "duckCreateTest/duckCreateResponse.json");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -89,7 +90,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Показать характеристики уточки, где положение крыльев - FIXED")
     @CitrusTest
     public void successfulPropertiesFixed(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "FIXED");
             runner.$(http().client(duckService)
                     .receive()
@@ -97,13 +98,14 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckProperties(runner, "${duckId}");
-            validateResponseString(runner, "{\n" +
-                    "  \"color\": \"red\",\n" +
-                    "  \"height\": 11.0,\n" +
-                    "  \"material\": \"rubber\",\n" +
-                    "  \"sound\": \"quak\",\n" +
-                    "  \"wingsState\": \"FIXED\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"color\": \"red\",\n" +
+                            "  \"height\": 11.0,\n" +
+                            "  \"material\": \"rubber\",\n" +
+                            "  \"sound\": \"quak\",\n" +
+                            "  \"wingsState\": \"FIXED\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -112,7 +114,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Показать характеристики уточки, где положение крыльев - UNDEFINED")
     @CitrusTest
     public void successfulPropertiesUndefined(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "UNDEFINED");
             runner.$(http().client(duckService)
                     .receive()
@@ -120,13 +122,14 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckProperties(runner, "${duckId}");
-            validateResponseString(runner, "{\n" +
-                    "  \"color\": \"red\",\n" +
-                    "  \"height\": 11.0,\n" +
-                    "  \"material\": \"rubber\",\n" +
-                    "  \"sound\": \"quak\",\n" +
-                    "  \"wingsState\": \"UNDEFINED\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"color\": \"red\",\n" +
+                            "  \"height\": 11.0,\n" +
+                            "  \"material\": \"rubber\",\n" +
+                            "  \"sound\": \"quak\",\n" +
+                            "  \"wingsState\": \"UNDEFINED\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -135,7 +138,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Показать характеристики уточки, где материал не rubber")
     @CitrusTest
     public void successfulPropertiesNotRubber(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "plastic", "quak", "ACTIVE");
             runner.$(http().client(duckService)
                     .receive()
@@ -143,13 +146,14 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckProperties(runner, "${duckId}");
-            validateResponseString(runner, "{\n" +
-                    "  \"color\": \"red\",\n" +
-                    "  \"height\": 11.0,\n" +
-                    "  \"material\": \"plastic\",\n" +
-                    "  \"sound\": \"quak\",\n" +
-                    "  \"wingsState\": \"ACTIVE\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"color\": \"red\",\n" +
+                            "  \"height\": 11.0,\n" +
+                            "  \"material\": \"plastic\",\n" +
+                            "  \"sound\": \"quak\",\n" +
+                            "  \"wingsState\": \"ACTIVE\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -159,7 +163,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Проверка голоса уточки. Кол-во повторов - 0, кол-во кряков в звуке - 2")
     @CitrusTest
     public void successfulQuakOptionOne(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
             runner.$(http().client(duckService)
                     .receive()
@@ -167,9 +171,10 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckQuack(runner, "${duckId}", "0", "2");
-            validateResponseString(runner, "{\n" +
-                    "  \"sound\": \"\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"sound\": \"\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -178,7 +183,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Проверка голоса уточки. Кол-во повторов - 3, кол-во кряков в звуке - 2")
     @CitrusTest
     public void successfulQuakOptionTwo(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
             runner.$(http().client(duckService)
                     .receive()
@@ -186,9 +191,10 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckQuack(runner, "${duckId}", "3", "2");
-            validateResponseString(runner, "{\n" +
-                    "  \"sound\": \"quak-quak, quak-quak, quak-quak\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"sound\": \"quak-quak, quak-quak, quak-quak\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -197,7 +203,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Проверка голоса уточки. Кол-во повторов - 2, кол-во кряков в звуке - 3")
     @CitrusTest
     public void successfulQuakOptionThree(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
             runner.$(http().client(duckService)
                     .receive()
@@ -205,9 +211,10 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckQuack(runner, "${duckId}", "2", "3");
-            validateResponseString(runner, "{\n" +
-                    "  \"sound\": \"quak-quak-quak, quak-quak-quak\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"sound\": \"quak-quak-quak, quak-quak-quak\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -216,7 +223,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Проверка голоса уточки. Кол-во повторов - 3, кол-во кряков в звуке - 3")
     @CitrusTest
     public void successfulQuakOptionFour(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
             runner.$(http().client(duckService)
                     .receive()
@@ -224,9 +231,10 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckQuack(runner, "${duckId}", "3", "3");
-            validateResponseString(runner, "{\n" +
-                    "  \"sound\": \"quak-quak-quak, quak-quak-quak, quak-quak-quak\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"sound\": \"quak-quak-quak, quak-quak-quak, quak-quak-quak\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -235,7 +243,7 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Проверка голоса уточки. Кол-во повторов - 3, кол-во кряков в звуке - 0")
     @CitrusTest
     public void successfulQuakOptionFive(@Optional @CitrusResource TestCaseRunner runner) {
-        try{
+        try {
             duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
             runner.$(http().client(duckService)
                     .receive()
@@ -243,9 +251,10 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckQuack(runner, "${duckId}", "3", "0");
-            validateResponseString(runner, "{\n" +
-                    "  \"sound\": \"\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"sound\": \"\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
@@ -263,9 +272,10 @@ public class DuckActionsTest extends DuckActionsClient {
                     .message()
                     .extract(fromBody().expression("$.id", "duckId")));
             duckSwim(runner, "${duckId}");
-            validateResponseString(runner, "{\n" +
-                    "  \"message\": \"I'm swimming\"\n" +
-                    "}");
+            validateResponseString(runner,
+                    "{\n" +
+                            "  \"message\": \"I'm swimming\"\n" +
+                            "}");
         } finally {
             duckDelete(runner, "${duckId}");
         }
