@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
+import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
+import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 @ContextConfiguration(classes = {EndpointConfig.class})
@@ -55,26 +57,16 @@ public class BaseTest extends TestNGCitrusSpringSupport {
                 .get(path));
     }
 
-    protected void sendPostRequest(TestCaseRunner runner,
+    protected void sendPostRequestString(TestCaseRunner runner,
                                    HttpClient URL,
                                    String path,
-                                   String queryName1, String queryValue1,
-                                   String queryName2, String queryValue2,
-                                   String queryName3, String queryValue3,
-                                   String queryName4, String queryValue4,
-                                   String queryName5, String queryValue5) {
+                                   String body) {
         runner.$(http().client(URL)
                 .send()
                 .post(path)
                 .message()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body("{\n" +
-                        "  \"" + queryName1 + "\": \"" + queryValue1 + "\",\n" +
-                        "  \"" + queryName2 + "\": " + queryValue2 + ",\n" +
-                        "  \"" + queryName3 + "\": \"" + queryValue3 + "\",\n" +
-                        "  \"" + queryName4 + "\": \"" + queryValue4 + "\",\n" +
-                        "  \"" + queryName5 + "\": \"" + queryValue5 + "\"\n" +
-                        "}"));
+                .body(body));
     }
 
     protected void sendPostRequest(TestCaseRunner runner, HttpClient URL, String path, Object expectedPayload) {
@@ -133,18 +125,6 @@ public class BaseTest extends TestNGCitrusSpringSupport {
                 .response(status)
                 .message().type(MessageType.JSON)
                 .body(response));
-    }
-
-    protected void validateResponseResourceForCreate(TestCaseRunner runner,
-                                                     HttpClient URL,
-                                                     HttpStatus status,
-                                                     String response) {
-        runner.$(http().client(URL)
-                .receive()
-                .response(status)
-                .message().type(MessageType.JSON)
-                .body(response)
-                .extract(fromBody().expression("$.id", "duckId")));
     }
 
     protected void validateResponseResource(TestCaseRunner runner,

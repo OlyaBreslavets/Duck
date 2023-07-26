@@ -1,13 +1,13 @@
 package autotests.clients;
 
 import autotests.BaseTest;
-import autotests.EndpointConfig;
 import com.consol.citrus.TestCaseRunner;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(classes = {EndpointConfig.class})
+import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
+import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+
 public class DuckActionsClient extends BaseTest {
 
     public void duckFly(TestCaseRunner runner, String id) {
@@ -37,20 +37,26 @@ public class DuckActionsClient extends BaseTest {
                                  String material,
                                  String sound,
                                  String wingsState) {
-        sendPostRequest(runner, duckService, "/api/duck/create",
-                "color", color,
-                "height", height,
-                "material", material,
-                "sound", sound,
-                "wingsState", wingsState);
+        sendPostRequestString(runner, duckService, "/api/duck/create",
+                "{\n" +
+                        "  \"color\": \"" + color + "\",\n" +
+                        "  \"height\": " + height + ",\n" +
+                        "  \"material\": \"" + material + "\",\n" +
+                        "  \"sound\": \"" + sound + "\",\n" +
+                        "  \"wingsState\": \"" + wingsState + "\"\n" +
+                        "}");
     }
 
     public void duckCreatePayload(TestCaseRunner runner, Object expectedPayload) {
         sendPostRequest(runner, duckService, "/api/duck/create", expectedPayload);
     }
 
-    public void duckDelete(TestCaseRunner runner, String id) {
-        sendDeleteRequest(runner, duckService, "/api/duck/delete", "id", id);
+    public void extractId(TestCaseRunner runner) {
+        runner.$(http().client(duckService)
+                .receive()
+                .response()
+                .message()
+                .extract(fromBody().expression("$.id", "duckId")));
     }
 
     @Description("Валидация полученного ответа (String)")

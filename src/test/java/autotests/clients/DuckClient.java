@@ -1,13 +1,14 @@
 package autotests.clients;
 
 import autotests.BaseTest;
-import autotests.EndpointConfig;
 import com.consol.citrus.TestCaseRunner;
+import com.consol.citrus.message.MessageType;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(classes = {EndpointConfig.class})
+import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
+import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+
 public class DuckClient extends BaseTest {
 
     public void duckCreateString(TestCaseRunner runner,
@@ -16,12 +17,14 @@ public class DuckClient extends BaseTest {
                                  String material,
                                  String sound,
                                  String wingsState) {
-        sendPostRequest(runner, duckService, "/api/duck/create",
-                "color", color,
-                "height", height,
-                "material", material,
-                "sound", sound,
-                "wingsState", wingsState);
+        sendPostRequestString(runner, duckService, "/api/duck/create",
+                "{\n" +
+                        "  \"color\": \"" + color + "\",\n" +
+                        "  \"height\": " + height + ",\n" +
+                        "  \"material\": \"" + material + "\",\n" +
+                        "  \"sound\": \"" + sound + "\",\n" +
+                        "  \"wingsState\": \"" + wingsState + "\"\n" +
+                        "}");
     }
 
     public void duckCreateResources(TestCaseRunner runner, String expectedResource) {
@@ -52,14 +55,27 @@ public class DuckClient extends BaseTest {
         sendGetRequest(runner, duckService, "/api/duck/getAllIds");
     }
 
+    public void extractId(TestCaseRunner runner) {
+        runner.$(http().client(duckService)
+                .receive()
+                .response()
+                .message()
+                .extract(fromBody().expression("$.id", "duckId")));
+    }
+
     @Description("Валидация полученного ответа (String)")
     public void validateResponseString(TestCaseRunner runner, String response) {
         validateResponse(runner, duckService, HttpStatus.OK, response);
     }
 
-    @Description("Валидация полученного ответа DUCK (String)")
-    public void validateResponseResourceForCreate(TestCaseRunner runner, String response) {
-        validateResponseResourceForCreate(runner, duckService, HttpStatus.OK, response);
+    @Description("Валидация полученного ответа с записью id в переменную (String)")
+    public void validateResponseAndExtractId(TestCaseRunner runner, String response) {
+        runner.$(http().client(duckService)
+                .receive()
+                .response(HttpStatus.OK)
+                .message().type(MessageType.JSON)
+                .body(response)
+                .extract(fromBody().expression("$.id", "duckId")));
     }
 
     @Description("Валидация полученного ответа (из папки resource)")
