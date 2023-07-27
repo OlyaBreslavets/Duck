@@ -12,7 +12,6 @@ import org.testng.annotations.Test;
 import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
 import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
 import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
-import static org.springframework.http.HttpStatus.OK;
 
 public class DuckActionsTest extends DuckActionsClient {
 
@@ -57,62 +56,69 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Показать характеристики уточки, где положение крыльев - ACTIVE")
     @CitrusTest
     public void successfulPropertiesActive(@Optional @CitrusResource TestCaseRunner runner) {
-        duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(11.0)
+                .material("rubber")
+                .sound("quak")
+                .wingsState(DuckProperties.WingsState.ACTIVE);
+
+        duckCreatePayload(runner, duckProperties);
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
         duckProperties(runner, "${duckId}");
-        validateResponseResource(runner, duckService, OK, "getDuckPropertiesTest/duckProperties.json");
+        validateResponsePayload(runner, duckProperties);
+        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     @Test(description = "Показать характеристики уточки, где положение крыльев - FIXED")
     @CitrusTest
     public void successfulPropertiesFixed(@Optional @CitrusResource TestCaseRunner runner) {
-        duckCreateString(runner, "red", "11", "rubber", "quak", "FIXED");
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(11.0)
+                .material("rubber")
+                .sound("quak")
+                .wingsState(DuckProperties.WingsState.FIXED);
+
+        duckCreatePayload(runner, duckProperties);
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
         duckProperties(runner, "${duckId}");
-        validateResponseString(runner,
-                "{\n" +
-                        "  \"color\": \"red\",\n" +
-                        "  \"height\": 11.0,\n" +
-                        "  \"material\": \"rubber\",\n" +
-                        "  \"sound\": \"quak\",\n" +
-                        "  \"wingsState\": \"FIXED\"\n" +
-                        "}");
+        validateResponsePayload(runner, duckProperties);
+        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     @Test(description = "Показать характеристики уточки, где положение крыльев - UNDEFINED")
     @CitrusTest
     public void successfulPropertiesUndefined(@Optional @CitrusResource TestCaseRunner runner) {
-        duckCreateString(runner, "red", "11", "rubber", "quak", "UNDEFINED");
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(11.0)
+                .material("rubber")
+                .sound("quak")
+                .wingsState(DuckProperties.WingsState.UNDEFINED);
+
+        duckCreatePayload(runner, duckProperties);
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
         duckProperties(runner, "${duckId}");
-        validateResponseString(runner,
-                "{\n" +
-                        "  \"color\": \"red\",\n" +
-                        "  \"height\": 11.0,\n" +
-                        "  \"material\": \"rubber\",\n" +
-                        "  \"sound\": \"quak\",\n" +
-                        "  \"wingsState\": \"UNDEFINED\"\n" +
-                        "}");
+        validateResponsePayload(runner, duckProperties);
+        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     @Test(description = "Показать характеристики уточки, где материал не rubber")
     @CitrusTest
     public void successfulPropertiesNotRubber(@Optional @CitrusResource TestCaseRunner runner) {
-        duckCreateString(runner, "red", "11", "plastic", "quak", "ACTIVE");
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(11.0)
+                .material("plastic")
+                .sound("quak")
+                .wingsState(DuckProperties.WingsState.ACTIVE);
+
+        duckCreatePayload(runner, duckProperties);
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
         duckProperties(runner, "${duckId}");
-        validateResponseString(runner,
-                "{\n" +
-                        "  \"color\": \"red\",\n" +
-                        "  \"height\": 11.0,\n" +
-                        "  \"material\": \"plastic\",\n" +
-                        "  \"sound\": \"quak\",\n" +
-                        "  \"wingsState\": \"ACTIVE\"\n" +
-                        "}");
+        validateResponsePayload(runner, duckProperties);
+        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     //Тест-кейсы для /api/duck/action/quak
