@@ -23,6 +23,14 @@ public class BaseTest extends TestNGCitrusSpringSupport {
     @Autowired
     protected HttpClient duckService;
 
+    @Autowired
+    protected SingleConnectionDataSource db;
+
+    protected void databaseUpdate(TestCaseRunner runner, String sql) {
+        runner.$(sql(db)
+                .statement(sql));
+    }
+
     protected void sendGetRequest(TestCaseRunner runner,
                                   HttpClient URL,
                                   String path,
@@ -147,5 +155,21 @@ public class BaseTest extends TestNGCitrusSpringSupport {
                 .response(status)
                 .message().type(MessageType.JSON)
                 .body(new ObjectMappingPayloadBuilder(expectedPayload, new ObjectMapper())));
+    }
+
+    protected void validateDuckInDatabase(TestCaseRunner runner,
+                                          String id,
+                                          String color,
+                                          String height,
+                                          String material,
+                                          String sound,
+                                          String wingsState) {
+        runner.$(query(db)
+                .statement("SELECT * FROM DUCK WHERE ID=" + id)
+                .validate("color",color)
+                .validate("height",height)
+                .validate("material",material)
+                .validate("sound",sound)
+                .validate("wings_state",wingsState));
     }
 }

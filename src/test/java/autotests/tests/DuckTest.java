@@ -48,6 +48,23 @@ public class DuckTest extends DuckClient {
         runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
+    @Test(description = "Проверка, что уточка создаётся (с проверкой данных в БД)")
+    @CitrusTest
+    public void successfulCreateDB(@Optional @CitrusResource TestCaseRunner runner) {
+        duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
+        validateResponseAndExtractId(runner,
+                "{\n" +
+                        "  \"id\": \"@ignore@\",\n" +
+                        "  \"color\": \"red\",\n" +
+                        "  \"height\": 11.0,\n" +
+                        "  \"material\": \"rubber\",\n" +
+                        "  \"sound\": \"quak\",\n" +
+                        "  \"wingsState\": \"ACTIVE\"\n" +
+                        "}");
+        validateDuckInDatabase(runner, "${duckId}", "red", "11.0", "rubber", "quak", "ACTIVE");
+        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+    }
+
     //Тест-кейсы для /api/duck/action/delete
     @Test(description = "Проверка, что уточка удаляется (уточка существующая)")
     @CitrusTest
@@ -77,9 +94,10 @@ public class DuckTest extends DuckClient {
     }
 
     //Тест-кейсы для /api/duck/action/getAllIds
-    @Test(description = "Проверка, что список уточек пуст (таблица duck пустая, предварительно выполнить команду: TRUNCATE TABLE DUCK)")
+    @Test(description = "Проверка, что список уточек пуст")
     @CitrusTest
     public void successfulGetAllIdsEmpty(@Optional @CitrusResource TestCaseRunner runner) {
+        runner.$(sql(db).statement("TRUNCATE TABLE DUCK"));
         duckGetAllIds(runner);
         validateResponseString(runner, "[]");
     }

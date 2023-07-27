@@ -168,6 +168,23 @@ public class DuckActionsTest extends DuckActionsClient {
                         "}");
     }
 
+    @Test(description = "Проверка голоса уточки. Кол-во повторов - 3, кол-во кряков в звуке - 3")
+    @CitrusTest
+    public void successfulQuakOptionFourDB(@Optional @CitrusResource TestCaseRunner runner) {
+        runner.$(query(db)
+                .statement("SELECT max(id)+1 ID FROM DUCK")
+                .extract("ID", "duckId"));
+        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        databaseUpdate(runner,
+                "INSERT INTO DUCK (id, color, height, material, sound, wings_state)\n" +
+                        "VALUES (${duckId}, 'orange', 10.0, 'rubber', 'quak','ACTIVE');");
+        duckQuack(runner, "${duckId}", "3", "3");
+        validateResponseString(runner,
+                "{\n" +
+                        "  \"sound\": \"quak-quak-quak, quak-quak-quak, quak-quak-quak\"\n" +
+                        "}");
+    }
+
     @Test(description = "Проверка голоса уточки. Кол-во повторов - 3, кол-во кряков в звуке - 0")
     @CitrusTest
     public void successfulQuakOptionFive(@Optional @CitrusResource TestCaseRunner runner) {
