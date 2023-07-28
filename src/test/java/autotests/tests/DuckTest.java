@@ -29,7 +29,7 @@ public class DuckTest extends DuckClient {
                         "  \"sound\": \"quak\",\n" +
                         "  \"wingsState\": \"ACTIVE\"\n" +
                         "}");
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
     }
 
     @Test(description = "Проверка, что уточка создаётся с пустым телом и заполняется значениями по умолчанию")
@@ -45,24 +45,30 @@ public class DuckTest extends DuckClient {
                         "  \"sound\": \"\",\n" +
                         "  \"wingsState\": \"UNDEFINED\"\n" +
                         "}");
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
     }
 
     @Test(description = "Проверка, что уточка создаётся (с проверкой данных в БД)")
     @CitrusTest
     public void successfulCreateDB(@Optional @CitrusResource TestCaseRunner runner) {
+        String color = "red";
+        String height = "11.0";
+        String material = "rubber";
+        String sound = "quack";
+        String wingsState = "ACTIVE";
+
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
         validateResponseAndExtractId(runner,
                 "{\n" +
                         "  \"id\": \"@ignore@\",\n" +
-                        "  \"color\": \"red\",\n" +
-                        "  \"height\": 11.0,\n" +
-                        "  \"material\": \"rubber\",\n" +
-                        "  \"sound\": \"quak\",\n" +
-                        "  \"wingsState\": \"ACTIVE\"\n" +
+                        "  \"color\": \"" + color + "\",\n" +
+                        "  \"height\": " + height + ",\n" +
+                        "  \"material\": \"" + material + "\",\n" +
+                        "  \"sound\": \"" + sound + "\",\n" +
+                        "  \"wingsState\": \"" + wingsState + "\"\n" +
                         "}");
-        validateDuckInDatabase(runner, "${duckId}", "red", "11.0", "rubber", "quak", "ACTIVE");
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
+        validateDuckInDatabase(runner, "${duckId}", color, height, material, sound, wingsState);
     }
 
     //Тест-кейсы для /api/duck/action/delete
@@ -71,7 +77,7 @@ public class DuckTest extends DuckClient {
     public void successfulDeleteExist(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckDelete(runner, "${duckId}");
         validateResponseString(runner,
                 "{\n" +
@@ -84,7 +90,6 @@ public class DuckTest extends DuckClient {
     public void successfulDeleteNotExist(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
         runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"));
         duckDelete(runner, "${duckId}");
         validateResponseString(runner,
@@ -105,6 +110,7 @@ public class DuckTest extends DuckClient {
     @Test(description = "Проверка, что списка уточек (созданы три уточки")
     @CitrusTest
     public void successfulGetAllIds(@Optional @CitrusResource TestCaseRunner runner) {
+        runner.$(sql(db).statement("TRUNCATE TABLE DUCK"));
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
         runner.$(http().client(duckService)
                 .receive()
@@ -145,7 +151,7 @@ public class DuckTest extends DuckClient {
 
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckUpdate(runner, "${duckId}", "yellow", "12.0", "plastic", "QUAK", "FIXED");
         validateResponsePayload(runner, defaultResponseProperties);
         validateDuckInDatabase(runner, "${duckId}", "yellow", "12.0", "plastic", "QUAK", "FIXED");

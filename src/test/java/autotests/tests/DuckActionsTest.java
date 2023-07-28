@@ -9,9 +9,7 @@ import com.consol.citrus.annotations.CitrusTest;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
-import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
 import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
-import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 
 public class DuckActionsTest extends DuckActionsClient {
 
@@ -29,7 +27,7 @@ public class DuckActionsTest extends DuckActionsClient {
 
         duckCreatePayload(runner, duckProperties);
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckFly(runner, "${duckId}");
         validateResponsePayload(runner, defaultResponseProperties);
     }
@@ -47,7 +45,7 @@ public class DuckActionsTest extends DuckActionsClient {
 
         duckCreatePayload(runner, duckProperties);
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckFly(runner, "${duckId}");
         validateResponsePayload(runner, defaultResponseProperties);
     }
@@ -65,9 +63,9 @@ public class DuckActionsTest extends DuckActionsClient {
 
         duckCreatePayload(runner, duckProperties);
         extractId(runner);
+        deleteFinally(runner);
         duckProperties(runner, "${duckId}");
         validateResponsePayload(runner, duckProperties);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     @Test(description = "Показать характеристики уточки, где положение крыльев - FIXED")
@@ -82,9 +80,9 @@ public class DuckActionsTest extends DuckActionsClient {
 
         duckCreatePayload(runner, duckProperties);
         extractId(runner);
+        deleteFinally(runner);
         duckProperties(runner, "${duckId}");
         validateResponsePayload(runner, duckProperties);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     @Test(description = "Показать характеристики уточки, где положение крыльев - UNDEFINED")
@@ -99,9 +97,9 @@ public class DuckActionsTest extends DuckActionsClient {
 
         duckCreatePayload(runner, duckProperties);
         extractId(runner);
+        deleteFinally(runner);
         duckProperties(runner, "${duckId}");
         validateResponsePayload(runner, duckProperties);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     @Test(description = "Показать характеристики уточки, где материал не rubber")
@@ -116,9 +114,9 @@ public class DuckActionsTest extends DuckActionsClient {
 
         duckCreatePayload(runner, duckProperties);
         extractId(runner);
+        deleteFinally(runner);
         duckProperties(runner, "${duckId}");
         validateResponsePayload(runner, duckProperties);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     //Тест-кейсы для /api/duck/action/quak
@@ -127,7 +125,7 @@ public class DuckActionsTest extends DuckActionsClient {
     public void successfulQuakOptionOne(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckQuack(runner, "${duckId}", "0", "2");
         validateResponseString(runner,
                 "{\n" +
@@ -140,7 +138,7 @@ public class DuckActionsTest extends DuckActionsClient {
     public void successfulQuakOptionTwo(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckQuack(runner, "${duckId}", "3", "2");
         validateResponseString(runner,
                 "{\n" +
@@ -153,7 +151,7 @@ public class DuckActionsTest extends DuckActionsClient {
     public void successfulQuakOptionThree(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckQuack(runner, "${duckId}", "2", "3");
         validateResponseString(runner,
                 "{\n" +
@@ -166,7 +164,7 @@ public class DuckActionsTest extends DuckActionsClient {
     public void successfulQuakOptionFour(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckQuack(runner, "${duckId}", "3", "3");
         validateResponseString(runner,
                 "{\n" +
@@ -180,7 +178,7 @@ public class DuckActionsTest extends DuckActionsClient {
         runner.$(query(db)
                 .statement("SELECT max(id)+1 ID FROM DUCK")
                 .extract("ID", "duckId"));
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         databaseUpdate(runner,
                 "INSERT INTO DUCK (id, color, height, material, sound, wings_state)\n" +
                         "VALUES (${duckId}, 'orange', 10.0, 'rubber', 'quak','ACTIVE');");
@@ -196,7 +194,7 @@ public class DuckActionsTest extends DuckActionsClient {
     public void successfulQuakOptionFive(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckQuack(runner, "${duckId}", "3", "0");
         validateResponseString(runner,
                 "{\n" +
@@ -210,7 +208,7 @@ public class DuckActionsTest extends DuckActionsClient {
     public void successfulSwim(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateString(runner, "red", "11", "rubber", "quak", "ACTIVE");
         extractId(runner);
-        runner.$(doFinally().actions(runner.$(sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
+        deleteFinally(runner);
         duckSwim(runner, "${duckId}");
         validateResponseString(runner,
                 "{\n" +

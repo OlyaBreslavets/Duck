@@ -6,6 +6,8 @@ import com.consol.citrus.message.MessageType;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 
+import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
+import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
@@ -61,6 +63,10 @@ public class DuckClient extends BaseTest {
                 .response()
                 .message()
                 .extract(fromBody().expression("$.id", "duckId")));
+    }
+
+    public void deleteFinally(TestCaseRunner runner) {
+        runner.$(doFinally().actions((sql(db).statement("DELETE FROM DUCK WHERE ID=${duckId}"))));
     }
 
     @Description("Валидация полученного ответа (String)")
