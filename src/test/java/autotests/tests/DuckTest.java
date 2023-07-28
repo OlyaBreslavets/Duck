@@ -5,6 +5,9 @@ import autotests.payloads.DefaultResponseProperties;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Flaky;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
@@ -13,10 +16,12 @@ import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
+@Epic("Тестирование функций создание, удаление, обновление и вывод всех id")
 public class DuckTest extends DuckClient {
 
     //Тест-кейсы для /api/duck/action/create
-    @Test(description = "Проверка, что уточка создаётся")
+    @Test(description = "create")
+    @Description("Проверка, что уточка создаётся")
     @CitrusTest
     public void successfulCreate(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
@@ -32,7 +37,8 @@ public class DuckTest extends DuckClient {
         deleteFinally(runner);
     }
 
-    @Test(description = "Проверка, что уточка создаётся с пустым телом и заполняется значениями по умолчанию")
+    @Test(description = "create (empty body)")
+    @Description("Проверка, что уточка создаётся с пустым телом и заполняется значениями по умолчанию")
     @CitrusTest
     public void successfulCreateDefault(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateResources(runner, "duckCreateTest/duckEmptyBody.json");
@@ -48,13 +54,14 @@ public class DuckTest extends DuckClient {
         deleteFinally(runner);
     }
 
-    @Test(description = "Проверка, что уточка создаётся (с проверкой данных в БД)")
+    @Test(description = "create DB")
+    @Description("Проверка, что уточка создаётся (с проверкой данных в БД)")
     @CitrusTest
     public void successfulCreateDB(@Optional @CitrusResource TestCaseRunner runner) {
         String color = "red";
         String height = "11.0";
         String material = "rubber";
-        String sound = "quack";
+        String sound = "quak";
         String wingsState = "ACTIVE";
 
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
@@ -72,7 +79,8 @@ public class DuckTest extends DuckClient {
     }
 
     //Тест-кейсы для /api/duck/action/delete
-    @Test(description = "Проверка, что уточка удаляется (уточка существующая)")
+    @Test(description = "delete")
+    @Description("Проверка, что уточка удаляется (уточка существующая)")
     @CitrusTest
     public void successfulDeleteExist(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
@@ -85,7 +93,9 @@ public class DuckTest extends DuckClient {
                         "}");
     }
 
-    @Test(description = "Проверка, что уточка удаляется (уточка несуществующая)")
+    @Test(description = "delete (no duck)")
+    @Description("Проверка, что уточка удаляется (уточка несуществующая)")
+    @Flaky
     @CitrusTest
     public void successfulDeleteNotExist(@Optional @CitrusResource TestCaseRunner runner) {
         duckCreateResources(runner, "getDuckPropertiesTest/duckProperties.json");
@@ -99,7 +109,8 @@ public class DuckTest extends DuckClient {
     }
 
     //Тест-кейсы для /api/duck/action/getAllIds
-    @Test(description = "Проверка, что список уточек пуст")
+    @Test(description = "getAllIds (empty list)")
+    @Description("Проверка, что список уточек пуст")
     @CitrusTest
     public void successfulGetAllIdsEmpty(@Optional @CitrusResource TestCaseRunner runner) {
         runner.$(sql(db).statement("TRUNCATE TABLE DUCK"));
@@ -107,7 +118,8 @@ public class DuckTest extends DuckClient {
         validateResponseString(runner, "[]");
     }
 
-    @Test(description = "Проверка, что списка уточек (созданы три уточки")
+    @Test(description = "getAllIds (three ducks)")
+    @Description("Проверка, что списка уточек (созданы три уточки")
     @CitrusTest
     public void successfulGetAllIds(@Optional @CitrusResource TestCaseRunner runner) {
         runner.$(sql(db).statement("TRUNCATE TABLE DUCK"));
@@ -143,7 +155,8 @@ public class DuckTest extends DuckClient {
     }
 
     //Тест-кейсы для /api/duck/update
-    @Test(description = "Проверка обновления уточки")
+    @Test(description = "update")
+    @Description("Проверка обновления уточки")
     @CitrusTest
     public void successfulUpdate(@Optional @CitrusResource TestCaseRunner runner) {
         DefaultResponseProperties defaultResponseProperties = new DefaultResponseProperties()

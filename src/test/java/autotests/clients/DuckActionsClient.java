@@ -2,6 +2,7 @@ package autotests.clients;
 
 import autotests.BaseTest;
 import com.consol.citrus.TestCaseRunner;
+import io.qameta.allure.Step;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 
@@ -12,14 +13,17 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 public class DuckActionsClient extends BaseTest {
 
+    @Step("Эндпоинт, заставляющий уточку лететь")
     public void duckFly(TestCaseRunner runner, String id) {
         sendGetRequest(runner, duckService, "/api/duck/action/fly", "id", id);
     }
 
+    @Step("Эндпоинт для вывода характеристик уточки")
     public void duckProperties(TestCaseRunner runner, String id) {
         sendGetRequest(runner, duckService, "/api/duck/action/properties", "id", id);
     }
 
+    @Step("Эндпоинт, заставляющий уточку крякать")
     public void duckQuack(TestCaseRunner runner, String id, String repetitionCount, String soundCount) {
         sendGetRequest(runner,
                 duckService,
@@ -29,10 +33,12 @@ public class DuckActionsClient extends BaseTest {
                 "soundCount", soundCount);
     }
 
+    @Step("Эндпоинт, заставляющий уточку плыть")
     public void duckSwim(TestCaseRunner runner, String id) {
         sendGetRequest(runner, duckService, "/api/duck/action/swim", "id", id);
     }
 
+    @Step("Эндпоинт для создания уточки с помощью строки")
     public void duckCreateString(TestCaseRunner runner,
                                  String color,
                                  String height,
@@ -49,6 +55,7 @@ public class DuckActionsClient extends BaseTest {
                         "}");
     }
 
+    @Step("Эндпоинт для создания уточки с помощью Payload")
     public void duckCreatePayload(TestCaseRunner runner, Object expectedPayload) {
         sendPostRequest(runner, duckService, "/api/duck/create", expectedPayload);
     }
