@@ -3,6 +3,7 @@ package autotests.clients;
 import autotests.BaseTest;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.message.MessageType;
+import io.qameta.allure.Step;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 
@@ -13,6 +14,7 @@ import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 
 public class DuckClient extends BaseTest {
 
+    @Step("Эндпоинт для создания уточки с помощью строки")
     public void duckCreateString(TestCaseRunner runner,
                                  String color,
                                  String height,
@@ -29,14 +31,17 @@ public class DuckClient extends BaseTest {
                         "}");
     }
 
+    @Step("Эндпоинт для создания уточки с помощью Resources")
     public void duckCreateResources(TestCaseRunner runner, String expectedResource) {
         sendPostRequest(runner, duckService, "/api/duck/create", expectedResource);
     }
 
+    @Step("Эндпоинт для удаления уточки")
     public void duckDelete(TestCaseRunner runner, String id) {
         sendDeleteRequest(runner, duckService, "/api/duck/delete", "id", id);
     }
 
+    @Step("Эндпоинт для обновления уточки")
     public void duckUpdate(TestCaseRunner runner,
                            String id,
                            String color,
@@ -53,6 +58,7 @@ public class DuckClient extends BaseTest {
                 "wingsState", wingsState);
     }
 
+    @Step("Эндпоинт для вывода id всех уточек")
     public void duckGetAllIds(TestCaseRunner runner) {
         sendGetRequest(runner, duckService, "/api/duck/getAllIds");
     }
